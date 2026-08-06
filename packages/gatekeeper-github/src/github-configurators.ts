@@ -1,5 +1,4 @@
 import { RpcTarget } from "cloudflare:workers";
-import { validateRpc } from "capnweb-validate";
 import {
   GitHubApi,
   type GitHubIssueResponse,
@@ -118,7 +117,7 @@ function pullRequestSearchOption(pullRequest: GitHubIssueResponse) {
 }
 
 // Capability exposed to the configurator iframe.
-@validateRpc()
+// @capnweb-validate
 export class GitHubRepoConfiguratorUI extends RpcTarget implements GitHubRepoConfiguratorRpc {
   constructor(getToken: () => Promise<string>) {
     super();
@@ -169,7 +168,7 @@ export class GitHubRepoConfiguratorUI extends RpcTarget implements GitHubRepoCon
 
 }
 
-@validateRpc()
+// @capnweb-validate
 export class GitHubIssueConfiguratorUI extends GitHubRepoConfiguratorUI implements GitHubIssueConfiguratorRpc {
   async listIssues(repoFullName: string | null | undefined, query: string): Promise<ConfiguratorOption[]> {
     if (!repoFullName) return [];
@@ -213,7 +212,7 @@ export class GitHubIssueConfiguratorUI extends GitHubRepoConfiguratorUI implemen
 
 }
 
-@validateRpc()
+// @capnweb-validate
 export class GitHubPullRequestConfiguratorUI extends GitHubRepoConfiguratorUI implements GitHubPullRequestConfiguratorRpc {
   async listPullRequests(repoFullName: string | null | undefined, query: string): Promise<ConfiguratorOption[]> {
     if (!repoFullName) return [];

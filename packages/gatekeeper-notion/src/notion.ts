@@ -14,7 +14,6 @@
 //     writes immediately. List simulation has documented limitations (see types.d.ts).
 
 import { DurableObject, RpcStub, RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import {
   stripTrailingSlashes,
   type AccountDescription,
@@ -286,7 +285,7 @@ export default {
 // ---------------------------------------------------------------------------------------------
 // Vendor
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     return {
@@ -478,7 +477,7 @@ type GatekeeperUserImplProps = {
   userObjectId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImplProps>
                                 implements GatekeeperUser {
   #userAccount() {
@@ -563,7 +562,7 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
   // a prospective observer may read a bound page/database (and, for workspace bindings, the workspace
   // and each accessed item). The verifier carries this user's own account id, so the access checks
   // run against the observer's *own* Notion token.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     const props: NotionVerifierProps = { userObjectId: this.ctx.props.userObjectId };
     return this.ctx.exports.NotionVerifier({ props });
@@ -599,7 +598,7 @@ export interface NotionVerifierApi extends GatekeeperUserVerifier {
   hasItemAccess(itemId: string): Promise<boolean>;
 }
 
-@validateRpc()
+// @capnweb-validate
 export class NotionVerifier extends WorkerEntrypoint<Env, NotionVerifierProps>
     implements NotionVerifierApi {
   #account() {
@@ -681,7 +680,7 @@ type NotionItemGatekeeperImplProps = {
   itemId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class NotionItemGatekeeperImpl extends DurableObject<Env, NotionItemGatekeeperImplProps>
     implements Gatekeeper<NotionPageSession | NotionDatabaseSession> {
   #api(): NotionApi {
@@ -783,7 +782,7 @@ type NotionWorkspaceGatekeeperImplProps = {
   userObjectId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class NotionWorkspaceGatekeeperImpl
     extends DurableObject<Env, NotionWorkspaceGatekeeperImplProps>
     implements Gatekeeper<NotionWorkspaceSession> {
@@ -944,7 +943,7 @@ export class NotionWorkspaceGatekeeperImpl
 // ---------------------------------------------------------------------------------------------
 // Cursor
 
-@validateRpc()
+// @capnweb-validate
 class PagedCursor<T> extends RpcTarget implements Cursor<T> {
   #fetchPage: (cursor: string | undefined, firstPage: boolean) =>
     Promise<{ items: T[]; nextCursor: string | undefined }>;
@@ -1007,7 +1006,7 @@ function disposeQueue(stub: RpcStub<ApprovalQueue>): void {
 // ---------------------------------------------------------------------------------------------
 // Sessions
 
-@validateRpc()
+// @capnweb-validate
 class NotionPageSessionImpl extends RpcTarget implements NotionPageSession {
   #store: NotionStore;
   #approvalQueue: RpcStub<ApprovalQueue>;
@@ -1265,7 +1264,7 @@ class NotionPageSessionImpl extends RpcTarget implements NotionPageSession {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class NotionDatabaseSessionImpl extends RpcTarget implements NotionDatabaseSession {
   #store: NotionStore;
   #approvalQueue: RpcStub<ApprovalQueue>;
@@ -1409,7 +1408,7 @@ function titlePropertyNameOf(schema: NotionDatabaseSchema): string | undefined {
   return undefined;
 }
 
-@validateRpc()
+// @capnweb-validate
 class NotionWorkspaceSessionImpl extends RpcTarget implements NotionWorkspaceSession {
   #store: NotionStore;
   #approvalQueue: RpcStub<ApprovalQueue>;

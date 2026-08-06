@@ -1,5 +1,4 @@
 import { RpcTarget } from "cloudflare:workers";
-import { validateRpc } from "capnweb-validate";
 import { SupabaseApi, type OrganizationResponse, type ProjectResponse } from "./supabase-api";
 import type { SupabaseOrganizationConfiguratorRpc } from "./configurator/supabase-organization-configurator-types";
 import type { SupabaseProjectConfiguratorRpc } from "./configurator/supabase-project-configurator-types";
@@ -44,7 +43,7 @@ function matches(parts: (string | undefined)[], query: string): boolean {
   return lower.split(/\s+/).every(term => corpus.includes(term));
 }
 
-@validateRpc()
+// @capnweb-validate
 export class SupabaseProjectConfiguratorUI extends RpcTarget implements SupabaseProjectConfiguratorRpc {
   constructor(getToken: () => Promise<string>) {
     super();
@@ -65,7 +64,7 @@ export class SupabaseProjectConfiguratorUI extends RpcTarget implements Supabase
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class SupabaseOrganizationConfiguratorUI extends RpcTarget implements SupabaseOrganizationConfiguratorRpc {
   constructor(getToken: () => Promise<string>) {
     super();

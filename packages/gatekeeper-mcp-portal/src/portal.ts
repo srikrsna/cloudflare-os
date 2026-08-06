@@ -6,7 +6,6 @@
 // setting rather than user input, and a grant is scoped to one upstream server. Everything else is
 // shared via `@gadgets/mcp-shared`. See the README.
 import { RpcStub, RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { validateRpc, skipRpcValidation } from "capnweb-validate";
 import { createLogger } from "@gadgets/backend-utils/logger";
 import {
   matchesResourceUrlPattern,
@@ -171,7 +170,7 @@ async function continueConnect(
 // ---------------------------------------------------------------------------
 // Vendor
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     const config = readPortalConfig(this.env);
@@ -245,7 +244,7 @@ export class McpAccount extends McpAccountBase<Env> {
 // ---------------------------------------------------------------------------
 // Account-facing interface
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl
   extends McpGatekeeperUserBase<Env>
   implements GatekeeperUser {
@@ -337,7 +336,7 @@ export class GatekeeperUserImpl
     };
   }
 
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     return this.ctx.exports.McpPortalVerifier({});
   }
@@ -348,7 +347,7 @@ export class GatekeeperUserImpl
 
 // Required by the `GatekeeperUser` contract but never interrogated, since `addObserver` refuses
 // everyone.
-@validateRpc()
+// @capnweb-validate
 export class McpPortalVerifier
   extends WorkerEntrypoint<Env>
   implements GatekeeperUserVerifier
@@ -359,7 +358,7 @@ export class McpPortalVerifier
 // ---------------------------------------------------------------------------
 // Resource configurator
 
-@validateRpc()
+// @capnweb-validate
 class McpServerConfiguratorUI extends RpcTarget implements McpServerConfiguratorRpc {
   #env: Env;
   #account: DurableObjectStub<McpAccount>;
@@ -564,7 +563,7 @@ export class McpGatekeeperImpl
 // ---------------------------------------------------------------------------
 // Session — the capability handed to the Gadget
 
-// Subclassed rather than used directly so `@validateRpc()` is applied in the file that hands the
-// class to a Gadget, where it can be seen.
-@validateRpc()
+// Subclassed rather than used directly so the `// @capnweb-validate` directive sits in the file
+// that hands the class to a Gadget, against the surface that file exposes.
+// @capnweb-validate
 class McpSessionImpl extends McpSessionBase {}

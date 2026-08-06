@@ -1,5 +1,4 @@
 import { RpcCompatible, RpcStub, RpcTarget } from "capnweb";
-import { validateRpc } from "capnweb-validate";
 import { Overseer, GadgetMetadata, UiBundle, WorkpieceId, WorkpieceSummary, WorkpiecesSubscriber, GadgetClient, GadgetBindingInfo, GatekeeperClient, ActionState, ActionLogEntry, ActionsSubscriber, CodeUpdate, CodeSubscriber, AiChatMetadata, AiChatMessage, AiChatHistoryPage, AiChatSubscriber, AiChatAuthorInfo, AiModelConfig, AiChatMessageBody, AgentSpawnerConfig, ConsoleLogSubscriber, ConsoleLogEvent, CapsuleSpecifier, CollaboratorInfo, CollaboratorRole, AffectedCollaborator, ShareLinkInfo, GatekeeperCreationSpec, ObserverConfigCallback, ObserverBindingNeed, ObserverBindingFailure, BlueprintBindingAnnotation, BlueprintBinding, BlueprintMetadata, BlueprintOutput, MessageFormatRef, isOutputIcon, SpawnerEnvTarget, BlueprintGadgetSummary, AiChatStreamEvent, BlueprintScreenshotUpload, BLUEPRINT_SCREENSHOT_R2_PREFIX, blueprintScreenshotUrl, ChatAttachmentUpload, ChatAttachmentHandle, ChatAttachmentRef, BoundHookInfo, PreApprovableAction, PresenceParticipant, PresenceSubscriber, SlashCommandChoice, SlashCommandRequest, validateBindingName, createOpenGadgetError, OPEN_GADGET_ERROR_CODES, resolveSiteName } from '@gadgets/workshop-shared/api';
 import { Gatekeeper, HookInitiator, ResourceDescription, ApprovalQueue, ActionDescription, ObservationAuthorizer, ObservationDescription, VendorDescription, SupportedResource, resolveRequestedResource, HookController, HookDescription, AGENT_CATALOG_MAX_ENTRIES, ActionKind } from "@gadgets/workshop-shared/gatekeeper";
 import {
@@ -7104,7 +7103,7 @@ function joinSessionPresence(
   };
 }
 
-@validateRpc()
+// @capnweb-validate
 class OverseerClientInterface extends RpcTarget implements Overseer {
   #clientProfilePromise: Promise<AiChatAuthorInfo> | undefined;
 
@@ -8763,7 +8762,7 @@ class OverseerClientInterface extends RpcTarget implements Overseer {
 // Default-deny is enforced at compile time: because this class `implements Overseer`, adding any
 // new method to the interface will fail to compile here until a developer consciously decides
 // whether "use" callers may invoke it.
-@validateRpc()
+// @capnweb-validate
 class UseOverseerInterface extends RpcTarget implements Overseer {
   constructor(private impl: OverseerImpl,
               private owner: DurableObjectStub<UserDurableObject>,
@@ -8989,7 +8988,7 @@ class UseOverseerInterface extends RpcTarget implements Overseer {
 
 // Capability representing one gadget workpiece, handed to "build"-role sessions via
 // Overseer.createGadget()/getGadget().
-@validateRpc()
+// @capnweb-validate
 class GadgetClientImpl extends RpcTarget implements GadgetClient {
   constructor(private impl: OverseerImpl, private id: WorkpieceId,
       private clientUser: DurableObjectStub<UserDurableObject>) {
@@ -9254,7 +9253,7 @@ class GadgetClientImpl extends RpcTarget implements GadgetClient {
 // render and interact with the gadget's deployed UI, mainline-only. Like UseOverseerInterface,
 // `implements GadgetClient` enforces default-deny at compile time: any new GadgetClient method
 // fails to compile here until a developer decides whether "use" callers may invoke it.
-@validateRpc()
+// @capnweb-validate
 class UseGadgetClientInterface extends RpcTarget implements GadgetClient {
   constructor(private impl: OverseerImpl, private id: WorkpieceId,
       private clientUser: DurableObjectStub<UserDurableObject>) {
@@ -9330,7 +9329,7 @@ class UseGadgetClientInterface extends RpcTarget implements GadgetClient {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class GatekeeperClientImpl<Session extends RpcCompatible<Session>>
     extends RpcTarget implements GatekeeperClient<Session> {
   constructor(private impl: OverseerImpl, private id: number,
@@ -9392,7 +9391,7 @@ class GatekeeperClientImpl<Session extends RpcCompatible<Session>>
 
 // ObservationAuthorizer handed to a slash-command provider. Scoped to one Gatekeeper; observations
 // only (no actions or hooks).
-@validateRpc()
+// @capnweb-validate
 class SlashCommandAuthorizerImpl extends NativeRpcTarget implements ObservationAuthorizer {
   constructor(private impl: OverseerImpl, private gatekeeperId: number,
               private caller: GatekeeperCaller) {
@@ -9404,7 +9403,7 @@ class SlashCommandAuthorizerImpl extends NativeRpcTarget implements ObservationA
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class ApprovalQueueImpl extends RpcTarget implements ApprovalQueue {
   constructor(private impl: OverseerImpl, private gatekeeperId: number,
               private caller: GatekeeperCaller) {
@@ -9493,7 +9492,7 @@ export class AgentSpawnerGatekeeper
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class AgentSpawnerBindingImpl extends RpcTarget implements AgentSpawnerBinding {
   constructor(private ctx: DurableObjectState<AgentSpawnerBindingProps>) {
     super();

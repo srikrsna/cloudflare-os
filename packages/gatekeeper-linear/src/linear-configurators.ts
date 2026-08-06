@@ -1,5 +1,4 @@
 import { RpcTarget } from "cloudflare:workers";
-import { validateRpc } from "capnweb-validate";
 import { LinearApi } from "./linear-api";
 import type { LinearWorkspaceConfiguratorRpc } from "./configurator/linear-workspace-configurator-types";
 import type { LinearTeamConfiguratorRpc } from "./configurator/linear-team-configurator-types";
@@ -49,7 +48,7 @@ function matches(parts: (string | null | undefined)[], query: string): boolean {
   return q.split(/\s+/).every(term => corpus.includes(term));
 }
 
-@validateRpc()
+// @capnweb-validate
 export class LinearWorkspaceConfiguratorUI extends RpcTarget implements LinearWorkspaceConfiguratorRpc {
   constructor(getToken: () => Promise<string>) {
     super();
@@ -67,7 +66,7 @@ export class LinearWorkspaceConfiguratorUI extends RpcTarget implements LinearWo
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class LinearTeamConfiguratorUI extends LinearWorkspaceConfiguratorUI implements LinearTeamConfiguratorRpc {
   async listTeams(query: string): Promise<ConfiguratorOption[]> {
     const conn = await allTeams(this);
@@ -83,7 +82,7 @@ export class LinearTeamConfiguratorUI extends LinearWorkspaceConfiguratorUI impl
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class LinearIssueConfiguratorUI extends LinearWorkspaceConfiguratorUI implements LinearIssueConfiguratorRpc {
   async listIssues(query: string): Promise<ConfiguratorOption[]> {
     const trimmed = query.trim();

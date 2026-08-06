@@ -1,5 +1,4 @@
 import { RpcStub, RpcTarget, newWorkersRpcResponse } from "capnweb";
-import { validateRpc } from "capnweb-validate";
 import type { JWTPayload } from "jose";
 import { PublicApi, AuthenticatedApi, Overseer, GadgetMetadataWithTimestamps, AiChatAuthorInfo, AiModelConfig, AiGatewayInfo, AiModelProvider, ConnectedAccountsSubscriber, ConnectedAccountsFilter, GatekeeperVendorFilter, ObserverConfigCallback, BlueprintLibrarySummary, BlueprintPublicInfo, BlueprintUserSummary, BlueprintBindingAssignment, AgentSpawnerConfig, WorkpieceId, BLUEPRINT_SCREENSHOT_PATH_PREFIX, BLUEPRINT_SCREENSHOT_R2_PREFIX, blueprintScreenshotUrl, ServerConfig, CloudflareUsageInfo, CloudflareAccountOption, LoginAttempt, GatekeeperAppInfo, AdminApi, GatekeeperVendorInfo, OutputFormatOffer, ListOutputsResult, createOpenGadgetError, getOpenGadgetErrorCode, OPEN_GADGET_ERROR_CODES } from '@gadgets/workshop-shared/api';
 import type { UiFeatureFlags } from "@gadgets/workshop-shared/feature-flags";
@@ -71,7 +70,7 @@ type Env = Cloudflare.Env & {
 
 // =======================================================================================
 
-@validateRpc()
+// @capnweb-validate
 class AuthenticatedApiImpl extends RpcTarget implements AuthenticatedApi {
   constructor(private ctx: ExecutionContext, private env: Env,
       private user: DurableObjectStub<UserDurableObject>,
@@ -609,7 +608,7 @@ async function serveBlueprintScreenshot(env: Env, blueprintId: string): Promise<
 // result through a capability (this stub) rather than a guessable id — no login id is ever exposed
 // to the client. Disposing the stub (e.g. when the pop-up closes or the component unmounts) cancels
 // the in-flight wait and lets the DO be evicted.
-@validateRpc()
+// @capnweb-validate
 class LoginAttemptImpl extends RpcTarget implements LoginAttempt {
   constructor(private pending: DurableObjectStub<PendingLogin>) {
     super();
@@ -620,7 +619,7 @@ class LoginAttemptImpl extends RpcTarget implements LoginAttempt {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class PublicApiImpl extends RpcTarget implements PublicApi {
   users: DurableObjectNamespace<UserDurableObject>;
 

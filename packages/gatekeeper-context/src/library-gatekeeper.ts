@@ -4,7 +4,6 @@
 
 import { WorkerEntrypoint, DurableObject, RpcStub as NativeRpcStub, RpcTarget as NativeRpcTarget } from "cloudflare:workers";
 import { RpcStub } from "capnweb";
-import { validateRpc, skipRpcValidation } from "capnweb-validate";
 import { boundAgentCatalog } from "@gadgets/workshop-shared/gatekeeper";
 import type {
   VendorDescription, AccountDescription, AgentCatalog, AgentCatalogRequest,
@@ -122,7 +121,7 @@ type ContextAccountProps = {
 };
 
 // Per-user Context capability: declares the singleton read path and management UI.
-@validateRpc()
+// @capnweb-validate
 export class ContextAccount
     extends WorkerEntrypoint<Cloudflare.Env, ContextAccountProps>
     implements GatekeeperUser {
@@ -191,13 +190,13 @@ export class ContextAccount
 
   // Mint a verifier tied to this account. ContextGatekeeper uses it to check whether a prospective
   // observer can independently read each collection the Gadget has observed.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     return this.ctx.exports.ContextVerifier({ props: this.ctx.props });
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ContextVerifier
     extends WorkerEntrypoint<Cloudflare.Env, ContextAccountProps>
     implements ContextVerifierApi {
@@ -215,7 +214,7 @@ export class ContextVerifier
 }
 
 // Gadget-side read path. Read-only: no actions are ever submitted.
-@validateRpc()
+// @capnweb-validate
 export class ContextGatekeeper
     extends DurableObject<Cloudflare.Env, ContextAccountProps>
     implements Gatekeeper<LibraryReadSession> {
@@ -386,7 +385,7 @@ type GatekeeperVendorProps = {
   sharingDomain?: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Cloudflare.Env, GatekeeperVendorProps> {
   async describe(): Promise<VendorDescription> {
     return {
@@ -406,7 +405,7 @@ export class GatekeeperVendor extends WorkerEntrypoint<Cloudflare.Env, Gatekeepe
   // Mint a fresh account capability with no user identity.
   //
   // Skip return validation: proxy-wrapping a WorkerEntrypoint stub breaks Workers serialization.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async createAccount(): Promise<Fetcher<GatekeeperUser>> {
     let sharingDomain = this.ctx.props.sharingDomain ?? DEFAULT_SHARING_DOMAIN;
     return this.ctx.exports.ContextAccount({

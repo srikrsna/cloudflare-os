@@ -1,5 +1,4 @@
 import { WorkerEntrypoint, DurableObject, RpcTarget, RpcStub } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import {
   GatekeeperUser,
   stripTrailingSlashes,
@@ -476,7 +475,7 @@ export default {
 // ---------------------------------------------------------------------------
 // Vendor
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     return {
@@ -675,7 +674,7 @@ type GatekeeperUserImplProps = {
   userObjectId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImplProps>
     implements GatekeeperUser {
   #account() {
@@ -798,7 +797,7 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
   // prospective observer may read a bound team/issue (and, for workspace bindings, the workspace and
   // each accessed team). The verifier carries this user's own account id, so the access checks run
   // against the observer's *own* Linear token.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     const props: LinearVerifierProps = { userObjectId: this.ctx.props.userObjectId };
     return this.ctx.exports.LinearVerifier({ props });
@@ -842,7 +841,7 @@ type TeamObservationCheck = {
 
 type ObservedTeamState = true | "pending" | "observed";
 
-@validateRpc()
+// @capnweb-validate
 export class LinearVerifier extends WorkerEntrypoint<Env, LinearVerifierProps>
     implements LinearVerifierApi {
   #orgUrlKey?: Promise<string | null>;
@@ -943,7 +942,7 @@ type LinearGatekeeperImplProps = {
   issueRef?: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class LinearGatekeeperImpl extends DurableObject<Env, LinearGatekeeperImplProps>
     implements Gatekeeper<LinearWorkspace | LinearTeam | LinearIssue> {
 
@@ -1734,7 +1733,7 @@ class StreamingCursor<TRaw, TOut> extends RpcTarget implements Cursor<TOut> {
 // ---------------------------------------------------------------------------
 // Session: Workspace
 
-@validateRpc()
+// @capnweb-validate
 class LinearWorkspaceSessionImpl extends RpcTarget implements LinearWorkspace {
   #gk: LinearGatekeeperImpl;
   #queue: RpcStub<ApprovalQueue>;
@@ -1841,7 +1840,7 @@ class LinearWorkspaceSessionImpl extends RpcTarget implements LinearWorkspace {
 // ---------------------------------------------------------------------------
 // Session: Team
 
-@validateRpc()
+// @capnweb-validate
 class LinearTeamSessionImpl extends RpcTarget implements LinearTeam {
   #gk: LinearGatekeeperImpl;
   #queue: RpcStub<ApprovalQueue>;
@@ -2002,7 +2001,7 @@ class LinearTeamSessionImpl extends RpcTarget implements LinearTeam {
 // ---------------------------------------------------------------------------
 // Session: Issue
 
-@validateRpc()
+// @capnweb-validate
 class LinearIssueImpl extends RpcTarget implements LinearIssue {
   #gk: LinearGatekeeperImpl;
   #queue: RpcStub<ApprovalQueue>;

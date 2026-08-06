@@ -1,5 +1,4 @@
 import { DurableObject, RpcStub, RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import {
   ApprovalQueue,
   stripTrailingSlashes,
@@ -352,7 +351,7 @@ export default {
 // ---------------------------------------------------------------------------
 // Vendor
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     return {
@@ -523,7 +522,7 @@ type HomeAssistantUserImplProps = {
   userObjectId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class HomeAssistantUserImpl
   extends WorkerEntrypoint<Env, HomeAssistantUserImplProps>
   implements GatekeeperUser
@@ -692,14 +691,14 @@ export class HomeAssistantUserImpl
   // could verify an observer against), so there is nothing meaningful to check. The verifier
   // carries no identity and is never consulted — but the overseer mints one on every open, so it
   // must exist and not throw.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     return this.ctx.exports.HomeAssistantVerifier({});
   }
 }
 
 // A trivial verifier since Home Assistant's observer strategy is low-stakes.
-@validateRpc()
+// @capnweb-validate
 export class HomeAssistantVerifier extends WorkerEntrypoint<Env> implements GatekeeperUserVerifier {
   verify(): void {}
 }
@@ -717,7 +716,7 @@ const instanceConfiguratorGetters = new WeakMap<
   () => Promise<HomeAssistantCredentials>
 >();
 
-@validateRpc()
+// @capnweb-validate
 class InstanceConfiguratorUI extends RpcTarget implements HomeAssistantInstanceConfiguratorRpc {
   constructor(getCredentials: () => Promise<HomeAssistantCredentials>) {
     super();
@@ -785,7 +784,7 @@ function buildEntityUrl(entityId: string): string {
   return `${ENTITY_RESOURCE.urlPattern.replace(":entityId", encodeURIComponent(entityId))}`;
 }
 
-@validateRpc()
+// @capnweb-validate
 class AreaConfiguratorUI extends RpcTarget implements HomeAssistantAreaConfiguratorRpc {
   constructor(getCredentials: () => Promise<HomeAssistantCredentials>) {
     super();
@@ -814,7 +813,7 @@ class AreaConfiguratorUI extends RpcTarget implements HomeAssistantAreaConfigura
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class LabelConfiguratorUI extends RpcTarget implements HomeAssistantLabelConfiguratorRpc {
   constructor(getCredentials: () => Promise<HomeAssistantCredentials>) {
     super();
@@ -847,7 +846,7 @@ class LabelConfiguratorUI extends RpcTarget implements HomeAssistantLabelConfigu
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class DeviceConfiguratorUI extends RpcTarget implements HomeAssistantDeviceConfiguratorRpc {
   constructor(getCredentials: () => Promise<HomeAssistantCredentials>) {
     super();
@@ -883,7 +882,7 @@ class DeviceConfiguratorUI extends RpcTarget implements HomeAssistantDeviceConfi
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class EntityConfiguratorUI extends RpcTarget implements HomeAssistantEntityConfiguratorRpc {
   constructor(getCredentials: () => Promise<HomeAssistantCredentials>) {
     super();
@@ -1033,7 +1032,7 @@ type AppliedActionRow = {
   appliedAt: number;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class HomeAssistantGatekeeperImpl
   extends DurableObject<Env, HomeAssistantGatekeeperImplProps>
   implements Gatekeeper<HomeAssistantSession | Area | Label | Device | Entity>
@@ -1972,7 +1971,7 @@ function buildTarget(target?: ServiceCallTarget): HATarget | undefined {
 // ---------------------------------------------------------------------------
 // Whole-instance Session
 
-@validateRpc()
+// @capnweb-validate
 class HomeAssistantSessionImpl extends RpcTarget implements HomeAssistantSession {
   #ctx: SessionContext;
 
@@ -2275,7 +2274,7 @@ class HomeAssistantSessionImpl extends RpcTarget implements HomeAssistantSession
 // ---------------------------------------------------------------------------
 // Area session/capability
 
-@validateRpc()
+// @capnweb-validate
 class AreaImpl extends RpcTarget implements Area {
   #ctx: SessionContext;
   #areaId: string;
@@ -2442,7 +2441,7 @@ class AreaImpl extends RpcTarget implements Area {
 // ---------------------------------------------------------------------------
 // Label session/capability
 
-@validateRpc()
+// @capnweb-validate
 class LabelImpl extends RpcTarget implements Label {
   #ctx: SessionContext;
   #labelId: string;
@@ -2549,7 +2548,7 @@ class LabelImpl extends RpcTarget implements Label {
 // ---------------------------------------------------------------------------
 // Device session/capability
 
-@validateRpc()
+// @capnweb-validate
 class DeviceImpl extends RpcTarget implements Device {
   #ctx: SessionContext;
   #deviceId: string;
@@ -2672,7 +2671,7 @@ class DeviceImpl extends RpcTarget implements Device {
 // ---------------------------------------------------------------------------
 // Entity session/capability
 
-@validateRpc()
+// @capnweb-validate
 class EntityImpl extends RpcTarget implements Entity {
   #ctx: SessionContext;
   #entityId: string;
@@ -3043,7 +3042,7 @@ function mapLightTurnOnData(data?: LightTurnOnData | Record<string, unknown>): R
 // ---------------------------------------------------------------------------
 // Dashboard
 
-@validateRpc()
+// @capnweb-validate
 class DashboardImpl extends RpcTarget implements Dashboard {
   #ctx: SessionContext;
   #urlPath: string;

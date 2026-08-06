@@ -4,7 +4,7 @@
 // Methods go on a prototype, never as own properties, since Cap'n Web and Workers RPC both refuse
 // own properties on an `RpcTarget`. Each is a one-line delegate to `callTool`, so the scope check,
 // approval queue, and observation record stay in one place and the delegates inherit the
-// `@validateRpc()` checking applied there.
+// generated RPC validation applied there.
 
 import type { ClassifiedTool } from "./tools.js";
 

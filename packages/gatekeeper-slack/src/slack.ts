@@ -1,5 +1,4 @@
 import { WorkerEntrypoint, DurableObject, RpcTarget, RpcStub } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import {
   GatekeeperUser, GatekeeperVendor as GatekeeperVendorIface, Gatekeeper, ResourceDescription,
   ApprovalQueue, VendorDescription, GatekeeperConnectCallback, GatekeeperConnectOptions,
@@ -274,7 +273,7 @@ export default {
 
 // ── Vendor ──────────────────────────────────────────────────────────
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     return {
@@ -520,7 +519,7 @@ type SlackUserImplProps = {
   userObjectId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class SlackUserImpl extends WorkerEntrypoint<Env, SlackUserImplProps>
                            implements GatekeeperUser {
   #account(): DurableObjectStub<UserAccount> {
@@ -649,7 +648,7 @@ export class SlackUserImpl extends WorkerEntrypoint<Env, SlackUserImplProps>
   // a prospective observer may read a bound conversation (and, for workspace bindings, the workspace
   // and each observed conversation). The verifier carries this user's own account id, so the access
   // checks run against the observer's *own* Slack token.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     let props: SlackVerifierProps = { userObjectId: this.ctx.props.userObjectId };
     return this.ctx.exports.SlackVerifier({ props });
@@ -681,7 +680,7 @@ export interface SlackVerifierApi extends GatekeeperUserVerifier {
   hasConversationAccess(conversationId: string): Promise<boolean>;
 }
 
-@validateRpc()
+// @capnweb-validate
 export class SlackVerifier extends WorkerEntrypoint<Env, SlackVerifierProps>
     implements SlackVerifierApi {
   #api(): SlackApi {
@@ -849,7 +848,7 @@ type SlackWorkspaceGatekeeperImplProps = {
 // once that observation has been authorized (see #prepareConversationObservation).
 type TrackedConversationState = "pending" | "observed";
 
-@validateRpc()
+// @capnweb-validate
 export class SlackWorkspaceGatekeeperImpl extends DurableObject<Env, SlackWorkspaceGatekeeperImplProps>
     implements Gatekeeper<SlackWorkspaceSession> {
   #apiInstance?: SlackApi;
@@ -1003,7 +1002,7 @@ type SlackConversationGatekeeperImplProps = {
   conversationId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class SlackConversationGatekeeperImpl
     extends DurableObject<Env, SlackConversationGatekeeperImplProps>
     implements Gatekeeper<SlackConversation> {
@@ -1074,7 +1073,7 @@ type SlackThreadGatekeeperImplProps = {
   permalink: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class SlackThreadGatekeeperImpl extends DurableObject<Env, SlackThreadGatekeeperImplProps>
     implements Gatekeeper<SlackThread> {
   #apiInstance?: SlackApi;
@@ -1142,7 +1141,7 @@ export class SlackThreadGatekeeperImpl extends DurableObject<Env, SlackThreadGat
 
 // ── Session stubs ───────────────────────────────────────────────────
 
-@validateRpc()
+// @capnweb-validate
 class SlackWorkspaceSessionImpl extends RpcTarget implements SlackWorkspaceSession {
   #ctx: SlackSessionContext;
 
@@ -1234,7 +1233,7 @@ class SlackWorkspaceSessionImpl extends RpcTarget implements SlackWorkspaceSessi
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class SlackConversationImpl extends RpcTarget implements SlackConversation {
   #ctx: SlackSessionContext;
   #conversationId: string;
@@ -1312,7 +1311,7 @@ class SlackConversationImpl extends RpcTarget implements SlackConversation {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class SlackThreadImpl extends RpcTarget implements SlackThread {
   #ctx: SlackSessionContext;
   #conversationId: string;

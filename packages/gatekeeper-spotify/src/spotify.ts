@@ -1,5 +1,4 @@
 import { DurableObject, RpcStub, RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { validateRpc, skipRpcValidation } from "capnweb-validate";
 import {
   ApprovalQueue,
   stripTrailingSlashes,
@@ -455,7 +454,7 @@ export default {
 // ---------------------------------------------------------------------------
 // Vendor
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     return {
@@ -633,7 +632,7 @@ type GatekeeperUserImplProps = {
   userObjectId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImplProps> implements GatekeeperUser {
   #userAccount(): DurableObjectStub<UserAccount> {
     return this.ctx.exports.UserAccount.get(this.ctx.exports.UserAccount.idFromString(this.ctx.props.userObjectId));
@@ -732,7 +731,7 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
   // corporate data the information-flow model is designed to protect, so any collaborator may
   // observe. The verifier therefore carries no identity and is never consulted — but the overseer
   // mints one on every open, so it must exist and not throw.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     return this.ctx.exports.SpotifyVerifier({});
   }
@@ -742,7 +741,7 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
 // Verifier
 //
 // A trivial verifier since Spotify's observer strategy is low-stakes.
-@validateRpc()
+// @capnweb-validate
 export class SpotifyVerifier extends WorkerEntrypoint<Env> implements GatekeeperUserVerifier {
   verify(): void {}
 }
@@ -918,7 +917,8 @@ const MAX_PLAYLIST_URIS_PER_CALL = 100;
 // placeholders in playlist results don't shrink a small requested limit below what was asked.
 const SEARCH_FETCH_MAX = 10;
 
-// Used by methods that opt out of generated RPC validation (@skipRpcValidation) so they can emit
+// Used by methods that opt out of generated RPC validation (see the ignore directive above each)
+// so they can emit
 // friendly domain errors instead of the framework's raw "expected union" message. Such methods
 // MUST validate every argument by hand, since the generated checks no longer run.
 function assertOptionalDeviceId(deviceId: unknown): void {
@@ -974,7 +974,7 @@ function applyPlaylistTrackOverlay(
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class SpotifyGatekeeperImpl extends DurableObject<Env, SpotifyGatekeeperImplProps>
   implements Gatekeeper<SpotifyAccountSession | SpotifyPlaylist> {
 
@@ -1909,7 +1909,7 @@ function disposeQueue(queue: RpcStub<ApprovalQueue>): void {
   (queue as RpcStub<ApprovalQueue> & { [Symbol.dispose](): void })[Symbol.dispose]();
 }
 
-@validateRpc()
+// @capnweb-validate
 class SpotifyPlayerImpl extends RpcTarget implements SpotifyPlayer {
   #gk: SpotifyGatekeeperImpl;
   #queue: RpcStub<ApprovalQueue>;
@@ -2009,7 +2009,7 @@ class SpotifyPlayerImpl extends RpcTarget implements SpotifyPlayer {
     await this.#submit({ op: "setVolume", volumePercent: volume, deviceId }, "Set volume", `Set playback volume to ${volume}%.`);
   }
 
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async setShuffle(shuffle: boolean, deviceId?: string): Promise<void> {
     if (typeof shuffle !== "boolean") {
       throw new Error("setShuffle(): shuffle must be a boolean (true or false).");
@@ -2018,7 +2018,7 @@ class SpotifyPlayerImpl extends RpcTarget implements SpotifyPlayer {
     await this.#submit({ op: "setShuffle", shuffle, deviceId }, "Set shuffle", `Turn shuffle ${shuffle ? "on" : "off"}.`);
   }
 
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async setRepeat(mode: string, deviceId?: string): Promise<void> {
     if (typeof mode !== "string" || !REPEAT_MODES.has(mode)) {
       throw new Error(`setRepeat(): mode must be one of "off", "track", or "context".`);
@@ -2044,7 +2044,7 @@ class SpotifyPlayerImpl extends RpcTarget implements SpotifyPlayer {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class SpotifyPlaylistImpl extends RpcTarget implements SpotifyPlaylist {
   #gk: SpotifyGatekeeperImpl;
   #queue: RpcStub<ApprovalQueue>;
@@ -2185,7 +2185,7 @@ class SpotifyPlaylistImpl extends RpcTarget implements SpotifyPlaylist {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class SpotifyAccountSessionImpl extends RpcTarget implements SpotifyAccountSession {
   #gk: SpotifyGatekeeperImpl;
   #queue: RpcStub<ApprovalQueue>;
@@ -2209,7 +2209,7 @@ class SpotifyAccountSessionImpl extends RpcTarget implements SpotifyAccountSessi
     return profile;
   }
 
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async search(query: string, types: string[], limit?: number): Promise<SpotifySearchResults> {
     if (typeof query !== "string" || query.trim() === "") {
       throw new Error("search(): query must be a non-empty string.");
@@ -2276,7 +2276,7 @@ class SpotifyAccountSessionImpl extends RpcTarget implements SpotifyAccountSessi
     return result;
   }
 
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getTopTracks(timeRange?: string, limit?: number): Promise<SpotifyTrack[]> {
     if (timeRange !== undefined && (typeof timeRange !== "string" || !TOP_TIME_RANGES.has(timeRange))) {
       throw new Error(`getTopTracks(): invalid timeRange "${timeRange}". Use short_term, medium_term, or long_term.`);
@@ -2290,7 +2290,7 @@ class SpotifyAccountSessionImpl extends RpcTarget implements SpotifyAccountSessi
     return tracks;
   }
 
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getTopArtists(timeRange?: string, limit?: number): Promise<SpotifyArtistRef[]> {
     if (timeRange !== undefined && (typeof timeRange !== "string" || !TOP_TIME_RANGES.has(timeRange))) {
       throw new Error(`getTopArtists(): invalid timeRange "${timeRange}". Use short_term, medium_term, or long_term.`);
@@ -2433,7 +2433,7 @@ function configuratorApi(target: object): SpotifyApi {
 
 const CONFIGURATOR_OPTION_LIMIT = 50;
 
-@validateRpc()
+// @capnweb-validate
 class SpotifyAccountConfiguratorUI extends RpcTarget implements SpotifyAccountConfiguratorRpc {
   constructor(getToken: () => Promise<string>) {
     super();
@@ -2446,7 +2446,7 @@ class SpotifyAccountConfiguratorUI extends RpcTarget implements SpotifyAccountCo
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class SpotifyPlaylistConfiguratorUI extends RpcTarget implements SpotifyPlaylistConfiguratorRpc {
   constructor(getToken: () => Promise<string>) {
     super();

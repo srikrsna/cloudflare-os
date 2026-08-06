@@ -1,5 +1,4 @@
 import { DurableObject, RpcStub, RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import {
   ApprovalQueue,
   stripTrailingSlashes,
@@ -320,7 +319,7 @@ export default {
 // ---------------------------------------------------------------------------
 // Vendor
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     return {
@@ -525,7 +524,7 @@ type GatekeeperUserImplProps = {
   userObjectId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImplProps> implements GatekeeperUser {
   #userAccount(): DurableObjectStub<UserAccount> {
     return this.ctx.exports.UserAccount.get(this.ctx.exports.UserAccount.idFromString(this.ctx.props.userObjectId));
@@ -583,14 +582,14 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
 
   // ZoomInfo uses the private-only observer strategy. The verifier is never consulted, but the
   // overseer mints one on every collaborator open, so getVerifier must still return a valid stub.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     return this.ctx.exports.ZoomInfoVerifier({});
   }
 }
 
 // A trivial verifier since ZoomInfoGatekeeperImpl refuses all non-owner observers.
-@validateRpc()
+// @capnweb-validate
 export class ZoomInfoVerifier extends WorkerEntrypoint<Env> implements GatekeeperUserVerifier {
   verify(): void {}
 }
@@ -607,7 +606,7 @@ class ZoomInfoAccountConfiguratorUI extends RpcTarget implements ZoomInfoAccount
 // ---------------------------------------------------------------------------
 // GatekeeperImpl — per-Gadget binding to the connected account.
 
-@validateRpc()
+// @capnweb-validate
 export class ZoomInfoGatekeeperImpl extends DurableObject<Env, ZoomInfoGatekeeperImplProps>
   implements Gatekeeper<ZoomInfoSession> {
 
@@ -985,7 +984,7 @@ async function performEnrichment(api: ZoomInfoApi, pending: PendingEnrichment): 
 // ---------------------------------------------------------------------------
 // SessionImpl — the RPC interface exposed to the Gadget.
 
-@validateRpc()
+// @capnweb-validate
 class ZoomInfoSessionImpl extends RpcTarget implements ZoomInfoSession {
   #account: DurableObjectStub<UserAccount>;
   #approvalQueue: RpcStub<ApprovalQueue>;

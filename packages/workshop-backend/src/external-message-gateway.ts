@@ -1,5 +1,4 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
-import { validateRpc } from "capnweb-validate";
 import {
   type ExternalMessageGateway as ExternalMessageGatewayContract,
   type SubmitExternalMessageInput,
@@ -10,7 +9,7 @@ type ExternalMessageGatewayProps = {
   source: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class ExternalMessageGateway extends WorkerEntrypoint<Cloudflare.Env, ExternalMessageGatewayProps> implements ExternalMessageGatewayContract {
   async submitExternalMessage(input: SubmitExternalMessageInput): Promise<SubmitExternalMessageResult> {
     let source = this.ctx.props.source;

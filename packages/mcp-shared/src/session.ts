@@ -59,8 +59,8 @@ export interface McpSessionHost {
 }
 
 // The Gadget-facing session. A named method per tool is installed on a per-grant subclass (see
-// `session-methods.ts`), each a one-line delegate to `callTool`. Connectors subclass this and apply
-// `@validateRpc()` there, so the decorator is visible in the file that hands it to a Gadget.
+// `session-methods.ts`), each a one-line delegate to `callTool`. Connectors subclass this and opt
+// that subclass in, so validation covers the tool surface the connector actually exposes.
 export class McpSessionBase extends RpcTarget {
   #host: McpSessionHost;
   #queue: RpcStub<ApprovalQueue>;

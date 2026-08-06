@@ -1,5 +1,4 @@
 import { DurableObject, RpcStub, RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import {
   ApprovalQueue,
   stripTrailingSlashes,
@@ -336,7 +335,7 @@ export default {
 // ---------------------------------------------------------------------------
 // Vendor
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     return {
@@ -546,7 +545,7 @@ export class UserAccount extends DurableObject<Env> {
 // ---------------------------------------------------------------------------
 // GatekeeperUserImpl — maps resource URLs to gatekeeper DO classes.
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImplProps> implements GatekeeperUser {
   #userAccount() {
     return this.ctx.exports.UserAccount.get(
@@ -662,7 +661,7 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
   // a prospective observer may read a bound project (and, for org bindings, the org and each
   // accessed project). The verifier carries this user's own account id, so the access checks run
   // against the observer's *own* Supabase token.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     const props: SupabaseVerifierProps = { userObjectId: this.ctx.props.userObjectId };
     return this.ctx.exports.SupabaseVerifier({ props });
@@ -700,7 +699,7 @@ type ProjectObservationCheck = {
 
 type ObservedProjectState = true | "pending" | "observed";
 
-@validateRpc()
+// @capnweb-validate
 export class SupabaseVerifier extends WorkerEntrypoint<Env, SupabaseVerifierProps>
     implements SupabaseVerifierApi {
   #api(): SupabaseApi {
@@ -911,7 +910,7 @@ class SupabaseSessionContext {
 // ---------------------------------------------------------------------------
 // GatekeeperImpl DO — per-resource instance, runs as a facet of the Overseer.
 
-@validateRpc()
+// @capnweb-validate
 export class SupabaseGatekeeperImpl extends DurableObject<Env, SupabaseGatekeeperImplProps>
     implements Gatekeeper<SupabaseProject | SupabaseOrganization> {
 
@@ -1195,7 +1194,7 @@ async function fetchProjectInfo(ctx: SupabaseSessionContext, ref: string): Promi
   });
 }
 
-@validateRpc()
+// @capnweb-validate
 class SupabaseOrganizationImpl extends RpcTarget implements SupabaseOrganization {
   #ctx: SupabaseSessionContext;
   #slug: string;
@@ -1254,7 +1253,7 @@ class SupabaseOrganizationImpl extends RpcTarget implements SupabaseOrganization
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class SupabaseProjectImpl extends RpcTarget implements SupabaseProject {
   #ctx: SupabaseSessionContext;
   #ref: string;
@@ -1348,7 +1347,7 @@ class SupabaseProjectImpl extends RpcTarget implements SupabaseProject {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class SupabaseDatabaseImpl extends RpcTarget implements SupabaseDatabase {
   #ctx: SupabaseSessionContext;
   #ref: string;

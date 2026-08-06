@@ -1,5 +1,4 @@
 import { WorkerEntrypoint, DurableObject, RpcTarget, RpcStub } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import {
   GatekeeperUser,
   GatekeeperUserVerifier,
@@ -111,7 +110,7 @@ function validateEmailName(value: string | undefined): { ok: true, emailName: st
 const emailConfiguratorEnvs = new WeakMap<object, Env>();
 
 // RPC interface exposed by Gatekeeper to the resource selection/configuration iframe.
-@validateRpc()
+// @capnweb-validate
 class EmailMailboxConfiguratorUI extends RpcTarget implements EmailMailboxConfiguratorRpc {
   constructor(env: Env) {
     super();
@@ -252,7 +251,7 @@ export default {
 // =======================================================================================
 // Top-level API exposed to the Workshop.
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   status() {
     return "Email Gatekeeper";
@@ -353,7 +352,7 @@ type GatekeeperUserImplProps = {
   userAccountId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImplProps>
                                 implements GatekeeperUser {
   async describe(): Promise<AccountDescription> {
@@ -462,21 +461,21 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
   // deployment's own domain specifically for the Gadget, so the Gadget's collaborators are the
   // intended audience. The verifier carries no identity and is never consulted — but the overseer
   // mints one on every open, so it must exist and not throw.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     return this.ctx.exports.EmailVerifier({});
   }
 }
 
 // A trivial verifier since the email gatekeeper's observer strategy is low-stakes.
-@validateRpc()
+// @capnweb-validate
 export class EmailVerifier extends WorkerEntrypoint<Env> implements GatekeeperUserVerifier {
   verify(): void {}
 }
 
 // =======================================================================================
 
-@validateRpc()
+// @capnweb-validate
 class EmailSessionImpl extends RpcTarget implements EmailSession {
   #emailName: string;
   #emailHost: string;
@@ -526,7 +525,7 @@ type EmailGatekeeperImplProps = {
 // HookController/HookInitiator generic constraint (Hook extends RpcTarget).
 type EmailHookTarget = RpcTarget & EmailHook;
 
-@validateRpc()
+// @capnweb-validate
 export class EmailGatekeeperImpl extends DurableObject<Env, EmailGatekeeperImplProps>
     implements Gatekeeper<EmailSession> {
 
@@ -581,7 +580,7 @@ export class EmailGatekeeperImpl extends DurableObject<Env, EmailGatekeeperImplP
   async removeObserver(_id: string): Promise<void> {}
 }
 
-@validateRpc()
+// @capnweb-validate
 export class EmailHookControllerImpl extends WorkerEntrypoint<Env, EmailGatekeeperImplProps>
     implements HookController<EmailHookTarget> {
   // `_target` is unused -- email doesn't display its hooks -- but must be declared, since RPC

@@ -1,5 +1,4 @@
 import { RpcTarget } from "cloudflare:workers";
-import { validateRpc } from "capnweb-validate";
 import { BigQueryApi } from "./bigquery-api";
 import { GoogleCalendarApi } from "./calendar-api";
 import { GoogleAccessToken } from "./google-api";
@@ -122,11 +121,11 @@ async function listDriveFiles(
 }
 
 // RPC interface exposed by Gatekeeper to the resource selection/configuration iframe.
-@validateRpc()
+// @capnweb-validate
 export class GmailConfiguratorUI extends RpcTarget implements GmailConfiguratorRpc {}
 
 // RPC interface exposed by Gatekeeper to the resource selection/configuration iframe.
-@validateRpc()
+// @capnweb-validate
 export class CalendarConfiguratorUI extends RpcTarget implements CalendarConfiguratorRpc {
   constructor(getToken: () => Promise<GoogleAccessToken>) {
     super();
@@ -156,7 +155,7 @@ export class CalendarConfiguratorUI extends RpcTarget implements CalendarConfigu
 }
 
 // RPC interface exposed by Gatekeeper to the resource selection/configuration iframe.
-@validateRpc()
+// @capnweb-validate
 export class BigQueryConfiguratorUI extends RpcTarget implements BigQueryConfiguratorRpc {
   constructor(getToken: () => Promise<GoogleAccessToken>) {
     super();
@@ -213,7 +212,7 @@ export class BigQueryConfiguratorUI extends RpcTarget implements BigQueryConfigu
 }
 
 // RPC interface exposed by Gatekeeper to the resource selection/configuration iframe.
-@validateRpc()
+// @capnweb-validate
 export class GoogleDocConfiguratorUI extends RpcTarget implements GoogleDocConfiguratorRpc {
   constructor(getToken: () => Promise<GoogleAccessToken>) {
     super();
@@ -228,7 +227,7 @@ export class GoogleDocConfiguratorUI extends RpcTarget implements GoogleDocConfi
 }
 
 // RPC interface exposed by Gatekeeper to the resource selection/configuration iframe.
-@validateRpc()
+// @capnweb-validate
 export class GoogleSheetsConfiguratorUI extends RpcTarget implements GoogleSheetsConfiguratorRpc {
   constructor(getToken: () => Promise<GoogleAccessToken>) {
     super();

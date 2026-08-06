@@ -15,7 +15,6 @@
 //  7. Observer verification — all bindings track independently restricted spaces and content.
 
 import { DurableObject, RpcStub, RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import {
   type AccountDescription,
   type ApprovalQueue,
@@ -235,7 +234,7 @@ export default {
 // ---------------------------------------------------------------------------------------------
 // Vendor
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     return {
@@ -409,7 +408,7 @@ export class UserAccount extends DurableObject<Env> {
 
 type GatekeeperUserImplProps = { userObjectId: string };
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImplProps>
                                 implements GatekeeperUser {
   #userAccount() {
@@ -500,7 +499,7 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
     return { url: `${getBaseUrl(this.env)}/${this.ctx.props.userObjectId}/${initiationNonce}` };
   }
 
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     const props: ConfluenceVerifierProps = { userObjectId: this.ctx.props.userObjectId };
     return this.ctx.exports.ConfluenceVerifier({ props });
@@ -512,7 +511,7 @@ type ConfluenceVerifierProps = { userObjectId: string };
 // Persistent verifier entrypoint representing one connected Confluence account. The props identify
 // the observer's UserAccount DO, so every access question below is answered with that observer's
 // token. The overseer only returns this stub to Confluence gatekeepers.
-@validateRpc()
+// @capnweb-validate
 export class ConfluenceVerifier extends WorkerEntrypoint<Env, ConfluenceVerifierProps>
     implements ConfluenceVerifierApi {
   #account() {
@@ -565,7 +564,7 @@ function makeApi(ctx: { exports: Cloudflare.Env }, props: BaseProps): Confluence
   });
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ConfluenceSiteGatekeeperImpl extends DurableObject<Env, SiteGatekeeperProps>
     implements Gatekeeper<ConfluenceSiteSession> {
   #store() { return new ConfluenceStore(this.ctx.storage.kv, makeApi(this.ctx, this.ctx.props)); }
@@ -612,7 +611,7 @@ export class ConfluenceSiteGatekeeperImpl extends DurableObject<Env, SiteGatekee
   async revertAction(action: number) { return await revertStoredAction(this.#store(), action); }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ConfluenceSpaceGatekeeperImpl extends DurableObject<Env, SpaceGatekeeperProps>
     implements Gatekeeper<ConfluenceSpaceSession> {
   #store() { return new ConfluenceStore(this.ctx.storage.kv, makeApi(this.ctx, this.ctx.props)); }
@@ -656,7 +655,7 @@ export class ConfluenceSpaceGatekeeperImpl extends DurableObject<Env, SpaceGatek
   async revertAction(action: number) { return await revertStoredAction(this.#store(), action); }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ConfluenceContentGatekeeperImpl extends DurableObject<Env, ContentGatekeeperProps>
     implements Gatekeeper<ConfluenceContentSession> {
   #store() { return new ConfluenceStore(this.ctx.storage.kv, makeApi(this.ctx, this.ctx.props)); }
@@ -708,7 +707,7 @@ function accountFor(ctx: { exports: Cloudflare.Env }, userObjectId: string) {
 // ---------------------------------------------------------------------------------------------
 // Cursor
 
-@validateRpc()
+// @capnweb-validate
 class PagedCursor<T> extends RpcTarget implements Cursor<T> {
   // `fetchPage` receives the current opaque cursor (undefined for the first page) and returns the
   // items plus the next cursor (undefined when exhausted).
@@ -759,7 +758,7 @@ async function authorizeConfluenceObservation(
 // ---------------------------------------------------------------------------------------------
 // Sessions
 
-@validateRpc()
+// @capnweb-validate
 class SiteSessionImpl extends RpcTarget implements ConfluenceSiteSession {
   #store: ConfluenceStore;
   #approvalQueue: RpcStub<ApprovalQueue>;
@@ -836,7 +835,7 @@ class SiteSessionImpl extends RpcTarget implements ConfluenceSiteSession {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class SpaceSessionImpl extends RpcTarget implements ConfluenceSpaceSession {
   #store: ConfluenceStore;
   #approvalQueue: RpcStub<ApprovalQueue>;
@@ -933,7 +932,7 @@ class SpaceSessionImpl extends RpcTarget implements ConfluenceSpaceSession {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class ContentSessionImpl extends RpcTarget implements ConfluenceContentSession {
   #store: ConfluenceStore;
   #approvalQueue: RpcStub<ApprovalQueue>;

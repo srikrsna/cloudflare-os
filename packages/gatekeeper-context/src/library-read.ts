@@ -3,7 +3,6 @@
 
 import { RpcStub as NativeRpcStub } from "cloudflare:workers";
 import { RpcTarget } from "capnweb";
-import { validateRpc } from "capnweb-validate";
 import type {
   ObservationAuthorizer, ObservationDescription,
 } from "@gadgets/workshop-shared/gatekeeper";
@@ -29,7 +28,7 @@ type ObserveCollections = (collectionIds: string[]) => Promise<{
   commit(): void;
 }>;
 
-@validateRpc()
+// @capnweb-validate
 export class LibraryReadSession extends RpcTarget {
   // Per-session enabled set. Visibility is retained by the source API, though observer enforcement
   // uses collection-level access checks rather than the old sticky sharing prohibition.

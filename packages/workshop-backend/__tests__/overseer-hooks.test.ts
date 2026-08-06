@@ -3,8 +3,6 @@ import { RpcStub as NativeRpcStub } from "cloudflare:workers";
 import { DEFAULT_ADMIN_CONFIG, serializeAdminConfig } from "../src/admin-config.js";
 import { OverseerDurableObject } from "../src/overseer.js";
 
-vi.mock("capnweb-validate", () => ({ validateRpc: () => () => undefined }));
-
 function makeOverseer(
     getConfig: () => Promise<string | null>,
     hook: { enabled: boolean; vendorId?: string; callback?: object } | null =

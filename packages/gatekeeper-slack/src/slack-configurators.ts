@@ -1,5 +1,4 @@
 import { RpcTarget } from "cloudflare:workers";
-import { validateRpc } from "capnweb-validate";
 import { SlackApi } from "./slack-api";
 import type { SlackConversationInfo } from "./types";
 import type {
@@ -30,7 +29,7 @@ function optionMatches(parts: (string | undefined)[], query: string): boolean {
   return lowerQuery.split(/\s+/).every(term => corpus.includes(term));
 }
 
-@validateRpc()
+// @capnweb-validate
 export class WorkspaceConfiguratorUI extends RpcTarget implements WorkspaceConfiguratorRpc {
   constructor(api: SlackApi) {
     super();
@@ -43,12 +42,12 @@ export class WorkspaceConfiguratorUI extends RpcTarget implements WorkspaceConfi
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ThreadConfiguratorUI extends RpcTarget implements ThreadConfiguratorRpc {
   async ping(): Promise<void> {}
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ConversationConfiguratorUI extends RpcTarget implements ConversationConfiguratorRpc {
   constructor(api: SlackApi, teamId: string) {
     super();

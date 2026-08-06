@@ -2,7 +2,6 @@ import { AdminApi, AdminFormat, AdminFormatPatch, AdminResourceVendor, AdminSett
 import { GatekeeperVendor } from '@gadgets/workshop-shared/gatekeeper';
 import { DurableObject } from 'cloudflare:workers';
 import { RpcTarget } from 'capnweb';
-import { validateRpc } from 'capnweb-validate';
 import { collection, createTypedStorage } from '@gadgets/typed-storage';
 import { createWorkshopLogger } from "./observability";
 import { ADMIN_CONFIG_KEY, FEATURED_BLUEPRINTS_KEY, isReservedBlueprintKey, parseBlueprintKvRecord, readBlueprintKvRecord, sanitizeBlueprintOutput, serializeFeaturedBlueprints } from './blueprint-archive.js';
@@ -550,7 +549,7 @@ export class AdminSettings extends DurableObject<Cloudflare.Env> {
 // gatekeeper/resource can't be re-enabled via a crafted request, and the client never receives a
 // stub to the DO's internal methods. Covers branding, agent instructions, signups, and gatekeeper
 // connector/resource availability; authentication config stays env-var driven.
-@validateRpc()
+// @capnweb-validate
 export class AdminApiImpl extends RpcTarget implements AdminApi {
   // `adminUserId` is the requesting admin's identity, forwarded to gatekeepers when listing the
   // resource catalog (some are RBAC-gated per user). It's plain data — not a user-DO dependency.

@@ -19,7 +19,7 @@
     "@gadgets/typed-storage": "workspace:*",
     "@gadgets/workshop-shared": "workspace:*",
     "capnweb": "^0.8.0",
-    "capnweb-validate": "0.2.1",
+    "capnweb-validate": "file:../../vendor/capnweb-validate-0.2.2.tgz",
     "isomorphic-git": "^1.40.0",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"

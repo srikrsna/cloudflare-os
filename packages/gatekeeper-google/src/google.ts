@@ -1,5 +1,4 @@
 import { WorkerEntrypoint, DurableObject, RpcTarget, RpcStub } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import { GatekeeperUser, GatekeeperUserVerifier, GatekeeperVendor as GatekeeperVendorIface, Gatekeeper, ResourceDescription, ApprovalQueue, ObservationDescription, VendorDescription, GatekeeperConnectCallback, GatekeeperConnectOptions, AccountDescription, SupportedResource, ResourceConfiguratorFrame, Cursor, ActionKind, stripTrailingSlashes } from '@gadgets/workshop-shared/gatekeeper';
 import { exchangeAuthCode, getAccessToken, getGoogleAccountDescription, getGoogleVerifiedEmail, GmailApi, GmailMessageRaw, GmailOutboundMessage, GoogleAccessToken, normalizeEmailRecipients, revokeGoogleToken } from "./google-api";
 import {
@@ -424,7 +423,7 @@ export default {
 // =======================================================================================
 
 // Top-level API exposed to the Workshop.
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   status() {
     return "Google Gatekeeper";
@@ -792,7 +791,7 @@ type GatekeeperUserImplProps = {
   userObjectId: string;
 }
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImplProps>
                                 implements GatekeeperUser {
   async describe(): Promise<AccountDescription> {
@@ -1036,7 +1035,7 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
   // id, so the access checks run against the observer's *own* Google token. (The Gmail gatekeeper
   // uses strategy A — it never consults the verifier — but getVerifier must still exist because the
   // overseer mints one on every open.)
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     let props: GoogleVerifierProps = { userObjectId: this.ctx.props.userObjectId };
     return this.ctx.exports.GoogleVerifier({ props });
@@ -1096,7 +1095,7 @@ type ObserverCheck<T> = {
 
 type ObservedSetState = true | "pending" | "observed";
 
-@validateRpc()
+// @capnweb-validate
 export class GoogleVerifier extends WorkerEntrypoint<Env, GoogleVerifierProps>
     implements GoogleVerifierApi {
   async #getToken(opts?: AccessTokenRequest): Promise<string> {
@@ -1278,7 +1277,7 @@ function validateOutboundInput(to: string[], subject: string, body: string): voi
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class GmailSessionImpl extends RpcTarget implements GmailSession {
   #ctx: GmailSessionContext;
 
@@ -1416,7 +1415,7 @@ async function submitGmailAction(
 // The cursor itself is a capability. The initial listThreads()/search() call
 // authorizes creation; each next() separately authorizes the page it returns.
 
-@validateRpc()
+// @capnweb-validate
 class GmailThreadCursorImpl extends RpcTarget implements Cursor<GmailThreadEntry> {
   #ctx: GmailSessionContext;
   #query: string | undefined;
@@ -1495,7 +1494,7 @@ class GmailThreadCursorImpl extends RpcTarget implements Cursor<GmailThreadEntry
 
 // ── GmailThreadStub ─────────────────────────────────────────────────
 
-@validateRpc()
+// @capnweb-validate
 class GmailThreadStub extends RpcTarget implements GmailThread {
   #ctx: GmailSessionContext;
   #threadId: string;
@@ -1625,7 +1624,7 @@ class GmailThreadStub extends RpcTarget implements GmailThread {
 
 // ── GmailMessageStub ────────────────────────────────────────────────
 
-@validateRpc()
+// @capnweb-validate
 class GmailMessageStub extends RpcTarget implements GmailMessage {
   #ctx: GmailSessionContext;
   #messageId: string;
@@ -1783,7 +1782,7 @@ type GmailGatekeeperImplProps = {
   labelName?: string;
 }
 
-@validateRpc()
+// @capnweb-validate
 export class GmailGatekeeperImpl extends DurableObject<Env, GmailGatekeeperImplProps>
     implements Gatekeeper<GmailSession> {
   #tokens = new AccessTokenCache(opts => {
@@ -2162,7 +2161,7 @@ const EDIT_DOCUMENT_ACTION: ActionKind = {
   label: "Document edits",
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GoogleDocGatekeeperImpl
     extends DurableObject<Env, GoogleDocGatekeeperImplProps>
     implements Gatekeeper<GoogleDocSession> {
@@ -2320,7 +2319,7 @@ export class GoogleDocGatekeeperImpl
   async removeObserver(_id: string): Promise<void> {}
 }
 
-@validateRpc()
+// @capnweb-validate
 class GoogleDocSessionImpl extends RpcTarget implements GoogleDocSession {
   #docsApi: GoogleDocsApi;
   #documentId: string;
@@ -2516,7 +2515,7 @@ type GoogleSheetsGatekeeperImplProps = {
   spreadsheetId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GoogleSheetsGatekeeperImpl
     extends DurableObject<Env, GoogleSheetsGatekeeperImplProps>
     implements Gatekeeper<GoogleSpreadsheetSession> {
@@ -2585,7 +2584,7 @@ export class GoogleSheetsGatekeeperImpl
   async removeObserver(_id: string): Promise<void> {}
 }
 
-@validateRpc()
+// @capnweb-validate
 class GoogleSpreadsheetSessionImpl extends RpcTarget implements GoogleSpreadsheetSession {
   #api: GoogleSheetsApi;
   #spreadsheetId: string;
@@ -3251,7 +3250,7 @@ type BigQueryGatekeeperImplProps = {
   scopedTableId?: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class BigQueryGatekeeperImpl
     extends DurableObject<Env, BigQueryGatekeeperImplProps>
     implements Gatekeeper<BigQuerySession> {
@@ -3416,7 +3415,7 @@ export class BigQueryGatekeeperImpl
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class BigQuerySessionImpl extends RpcTarget implements BigQuerySession {
   #api: BigQueryApi;
   #approvalQueue: RpcStub<ApprovalQueue>;

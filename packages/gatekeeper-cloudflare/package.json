@@ -14,7 +14,7 @@
     "@gadgets/backend-utils": "workspace:*",
     "@gadgets/workshop-shared": "workspace:*",
     "capnweb": "^0.8.0",
-    "capnweb-validate": "0.2.1"
+    "capnweb-validate": "file:../../vendor/capnweb-validate-0.2.2.tgz"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

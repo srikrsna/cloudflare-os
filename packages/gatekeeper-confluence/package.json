@@ -16,7 +16,7 @@
     "@gadgets/configurator-ui": "workspace:*",
     "@gadgets/workshop-shared": "workspace:*",
     "capnweb": "^0.8.0",
-    "capnweb-validate": "0.2.1",
+    "capnweb-validate": "file:../../vendor/capnweb-validate-0.2.2.tgz",
     "node-html-parser": "^7.1.0"
   },
   "devDependencies": {

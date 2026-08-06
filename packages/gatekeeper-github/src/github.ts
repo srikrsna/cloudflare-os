@@ -1,5 +1,4 @@
 import { DurableObject, RpcStub, RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import {
   ApprovalQueue,
   stripTrailingSlashes,
@@ -811,7 +810,7 @@ function parsePatch(patch: string): GitHubPullRequestDiffHunk[] {
   return hunks;
 }
 
-@validateRpc()
+// @capnweb-validate
 class ArrayCursor<T> extends RpcTarget implements Cursor<T> {
   #items: T[];
   #pageSize: number;
@@ -841,7 +840,7 @@ class ArrayCursor<T> extends RpcTarget implements Cursor<T> {
  * This avoids the need to fetch ALL pages upfront before returning any results, which is
  * critical for repos with large issue/PR histories.
  */
-@validateRpc()
+// @capnweb-validate
 class StreamingCursor<T> extends RpcTarget implements Cursor<T> {
   /** Fetches one page of already-normalized items from the remote API (or cache). */
   #fetchPage: (page: number, perPage: number) => Promise<T[]>;
@@ -1008,7 +1007,7 @@ export default {
   },
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Env> implements GatekeeperVendorIface {
   async describe(): Promise<VendorDescription> {
     return {
@@ -1196,7 +1195,7 @@ type GatekeeperUserImplProps = {
   userObjectId: string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImplProps> implements GatekeeperUser {
   async #withApi<T>(fn: (api: GitHubApi, scopes: string[]) => Promise<T>): Promise<T> {
     const id = this.ctx.exports.UserAccount.idFromString(this.ctx.props.userObjectId);
@@ -1328,7 +1327,7 @@ export class GatekeeperUserImpl extends WorkerEntrypoint<Env, GatekeeperUserImpl
   // a prospective observer is allowed to read a bound repository (see that method). The verifier
   // carries this user's own account id, so when the gatekeeper calls hasRepoAccess() the check runs
   // against the observer's *own* GitHub token.
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     const props: GitHubVerifierProps = { userObjectId: this.ctx.props.userObjectId };
     return this.ctx.exports.GitHubVerifier({ props });
@@ -1358,7 +1357,7 @@ export interface GitHubVerifierApi extends GatekeeperUserVerifier {
   hasRepoAccess(owner: string, repo: string): Promise<boolean>;
 }
 
-@validateRpc()
+// @capnweb-validate
 export class GitHubVerifier extends WorkerEntrypoint<Env, GitHubVerifierProps>
     implements GitHubVerifierApi {
   async hasRepoAccess(owner: string, repo: string): Promise<boolean> {
@@ -1379,7 +1378,7 @@ export class GitHubVerifier extends WorkerEntrypoint<Env, GitHubVerifierProps>
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class GitHubGatekeeperImpl extends DurableObject<Env, GitHubGatekeeperImplProps>
   implements Gatekeeper<GitHubRepoSession | GitHubIssue | GitHubPullRequest> {
 
@@ -3781,7 +3780,7 @@ export class GitHubGatekeeperImpl extends DurableObject<Env, GitHubGatekeeperImp
   async removeObserver(_id: string): Promise<void> {}
 }
 
-@validateRpc()
+// @capnweb-validate
 class GitHubRepoSessionImpl extends RpcTarget implements GitHubRepoSession {
   #gatekeeper: GitHubGatekeeperImpl;
   #approvalQueue: RpcStub<ApprovalQueue>;
@@ -3876,7 +3875,7 @@ class GitHubRepoSessionImpl extends RpcTarget implements GitHubRepoSession {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class GitHubIssueImpl extends RpcTarget implements GitHubIssue {
   protected gatekeeper: GitHubGatekeeperImpl;
   protected approvalQueue: RpcStub<ApprovalQueue>;
@@ -3994,7 +3993,7 @@ class GitHubIssueImpl extends RpcTarget implements GitHubIssue {
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class GitHubPullRequestImpl extends GitHubIssueImpl implements GitHubPullRequest {
   constructor(gatekeeper: GitHubGatekeeperImpl, approvalQueue: RpcStub<ApprovalQueue>, logicalId: string) {
     super(gatekeeper, approvalQueue, logicalId, "pull");

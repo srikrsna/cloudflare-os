@@ -1,5 +1,4 @@
 import { DurableObject, RpcStub, RpcTarget } from "cloudflare:workers";
-import { validateRpc } from "capnweb-validate";
 import type {
   AnthropicMessagesCompat, Api, AssistantMessageEventStream, Context, Model, ModelCost,
   OpenAICompletionsCompat, ProviderHeaders, SimpleStreamOptions, StreamFunction,
@@ -659,7 +658,7 @@ export class LanguageModelGatekeeper
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 class LanguageModelBindingImpl extends RpcTarget implements LanguageModelBinding {
   constructor(private model: ModelHandle) {
     super();

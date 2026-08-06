@@ -4,7 +4,6 @@ import {
   RpcTarget,
   WorkerEntrypoint,
 } from "cloudflare:workers";
-import { skipRpcValidation, validateRpc } from "capnweb-validate";
 import type {
   AccountDescription,
   ActionKind,
@@ -87,7 +86,7 @@ export type ScheduleSessionDependencies = {
   randomId?: () => string;
 };
 
-@validateRpc()
+// @capnweb-validate
 export class ScheduleSessionImpl extends RpcTarget implements ScheduleSession {
   readonly #accountId: string;
   readonly #workspaceId: string;
@@ -205,7 +204,7 @@ export function disableScheduleController(
   return driver.disable(props.workspaceId, props.scheduleId);
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ScheduleHookController
   extends WorkerEntrypoint<Cloudflare.Env, ScheduleControllerProps>
   implements HookController<ScheduleHookTarget>
@@ -225,7 +224,7 @@ export class ScheduleHookController
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class SchedulerGatekeeper
   extends DurableObject<Cloudflare.Env, { accountId: string }>
   implements Gatekeeper<ScheduleSession>
@@ -301,7 +300,7 @@ export class SchedulerGatekeeper
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ScheduleManagementApi extends RpcTarget {
   constructor(private readonly driver: Pick<ScheduleDriver, "listAccount">) {
     super();
@@ -325,7 +324,7 @@ export function describeScheduleAccount(): AccountDescription {
   };
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ScheduleAccount
   extends WorkerEntrypoint<Cloudflare.Env, ScheduleAccountProps>
   implements GatekeeperUser
@@ -382,7 +381,7 @@ export class ScheduleAccount
   }
 
   /** Mints the trivial verifier used by the low-stakes observer policy. */
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async getVerifier(): Promise<Fetcher<GatekeeperUserVerifier>> {
     return this.ctx.exports.ScheduleVerifier({});
   }
@@ -392,7 +391,7 @@ export class ScheduleAccount
   }
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ScheduleVerifier
   extends WorkerEntrypoint<Cloudflare.Env>
   implements GatekeeperUserVerifier
@@ -400,7 +399,7 @@ export class ScheduleVerifier
   verify(): void {}
 }
 
-@validateRpc()
+// @capnweb-validate
 export class GatekeeperVendor extends WorkerEntrypoint<Cloudflare.Env> {
   /** Describes the auto-provisioned Scheduled Tasks vendor. */
   async describe(): Promise<VendorDescription> {
@@ -416,7 +415,7 @@ export class GatekeeperVendor extends WorkerEntrypoint<Cloudflare.Env> {
   }
 
   /** Mints a new opaque Scheduler account capability. */
-  @skipRpcValidation()
+  // @capnweb-validate-ignore
   async createAccount(): Promise<Fetcher<GatekeeperUser>> {
     return this.ctx.exports.ScheduleAccount({
       props: { accountId: crypto.randomUUID() },

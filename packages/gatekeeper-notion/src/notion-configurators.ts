@@ -1,5 +1,4 @@
 import { RpcTarget } from "cloudflare:workers";
-import { validateRpc } from "capnweb-validate";
 import { NotionApi, itemResponseToSummary } from "./notion-api";
 import type {
   ConfiguratorOption,
@@ -19,7 +18,7 @@ function notionApi(target: object): NotionApi {
 }
 
 // Capability exposed to the page/database configurator iframe.
-@validateRpc()
+// @capnweb-validate
 export class NotionItemConfiguratorUI extends RpcTarget implements NotionItemConfiguratorRpc {
   constructor(getToken: () => Promise<string>) {
     super();
@@ -47,7 +46,7 @@ export class NotionItemConfiguratorUI extends RpcTarget implements NotionItemCon
 }
 
 // Capability exposed to the whole-workspace configurator iframe.
-@validateRpc()
+// @capnweb-validate
 export class NotionWorkspaceConfiguratorUI extends RpcTarget implements NotionWorkspaceConfiguratorRpc {
   constructor(getToken: () => Promise<string>) {
     super();

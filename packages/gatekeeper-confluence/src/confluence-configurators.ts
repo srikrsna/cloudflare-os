@@ -1,5 +1,4 @@
 import { RpcTarget } from "cloudflare:workers";
-import { validateRpc } from "capnweb-validate";
 import {
   ConfluenceApi,
   buildCql,
@@ -26,7 +25,7 @@ const apiFor = (site: AccessibleResource, getToken: () => Promise<string>): Conf
   new ConfluenceApi({ cloudId: site.id, webBase: `${site.url}/wiki`, getToken });
 
 // Single capability backing all three configurator iframes (each calls only the method it needs).
-@validateRpc()
+// @capnweb-validate
 export class ConfluenceConfiguratorUI extends RpcTarget
     implements ConfluenceSiteConfiguratorRpc, ConfluenceSpaceConfiguratorRpc, ConfluencePageConfiguratorRpc {
   constructor(getSites: () => Promise<AccessibleResource[]>, getToken: () => Promise<string>) {

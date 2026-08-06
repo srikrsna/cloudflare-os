@@ -2,7 +2,6 @@
 // collections; admins also manage public collections. Everything is sharing-domain scoped.
 
 import { RpcTarget } from "capnweb";
-import { validateRpc } from "capnweb-validate";
 import {
   ContextApi, ContextCollectionContent, ContextCollectionMetadata, ContextCollectionVisibility,
   ContextDocument, ContextDocumentSummary, ContextGitTokenCreateResult, ContextGitTokenList,
@@ -54,7 +53,7 @@ export async function loadEnabledContextCollections(
   return result;
 }
 
-@validateRpc()
+// @capnweb-validate
 export class ContextApiImpl extends RpcTarget implements ContextApi {
   constructor(
     private env: Cloudflare.Env,

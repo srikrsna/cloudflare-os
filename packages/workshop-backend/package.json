@@ -25,7 +25,7 @@
     "@gadgets/typed-storage": "workspace:*",
     "@gadgets/workshop-shared": "workspace:*",
     "capnweb": "^0.8.0",
-    "capnweb-validate": "0.2.1",
+    "capnweb-validate": "file:../../vendor/capnweb-validate-0.2.2.tgz",
     "diff": "^8.0.4",
     "jose": "^6.2.5",
     "yjs": "^13.6.31"
