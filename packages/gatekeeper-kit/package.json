@@ -25,6 +25,7 @@
     "./git-transport": "./src/git-transport.ts",
     "./hook-delivery-queue": "./src/hook-delivery-queue.ts",
     "./hook-registry": "./src/hook-registry.ts",
+    "./http": "./src/http.ts",
     "./http-errors": "./src/http-errors.ts",
     "./observers": "./src/observers.ts",
     "./oauth-client": "./src/oauth-client.ts",
